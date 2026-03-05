@@ -551,6 +551,13 @@ const App: React.FC = () => {
           }} language={language} />
       )}
 
+      {/* Charity Board */}
+      <CharityBoard 
+        isOpen={showCharityBoard} 
+        onClose={() => setShowCharityBoard(false)} 
+        language={language} 
+      />
+
       {/* Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center backdrop-blur-sm" onClick={() => setShowSettings(false)}>
