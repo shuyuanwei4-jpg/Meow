@@ -1424,7 +1424,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
           return;
       }
 
-      const isGrabbing = dragTargetRef.current?.type === 'cat';
+      const isGrabbing = !!dragTargetRef.current;
       const cat = catRef.current;
       
       const distToFood = Math.hypot(cat.x - CURRENT_FOOD_BOWL.x, cat.y - CURRENT_FOOD_BOWL.y);
