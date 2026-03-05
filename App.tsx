@@ -211,11 +211,13 @@ const StoryView: React.FC<{
         className={`bg-[#fdfbf7] w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl relative p-8 border-8 border-double border-[#d4a373] animate-[slideUp_0.5s_ease-out] ${fontClass}`}
         onClick={e => e.stopPropagation()}
         style={{
-            backgroundImage: 'repeating-linear-gradient(#fdfbf7 0px, #fdfbf7 24px, #e5e5e5 25px)',
+            backgroundImage: story.realImage ? `linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url(${story.realImage})` : 'repeating-linear-gradient(#fdfbf7 0px, #fdfbf7 24px, #e5e5e5 25px)',
+            backgroundSize: story.realImage ? 'cover' : 'auto',
+            backgroundPosition: 'center',
             backgroundAttachment: 'local'
         }}
       >
-        <button onClick={onClose} className="absolute top-4 right-4 text-3xl hover:scale-110 text-[#2d2d2d]">✖️</button>
+        <button onClick={onClose} className="absolute top-4 right-4 text-3xl hover:scale-110 text-[#2d2d2d] z-10">✖️</button>
         
         <div className="flex flex-col gap-4 text-[#2d2d2d]">
            <div className="text-center border-b-2 border-[#2d2d2d] pb-4 mb-4">
@@ -590,6 +592,16 @@ const App: React.FC = () => {
                   className="bg-white border-2 border-black px-4 py-2 rounded-xl text-xl font-bold hover:bg-gray-100 min-w-[100px]"
                 >
                   {getLanguageLabel(language)}
+                </button>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-xl font-bold text-red-600">Reload Game</span>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="bg-red-100 border-2 border-red-500 text-red-600 px-4 py-2 rounded-xl text-lg font-bold hover:bg-red-200 min-w-[100px]"
+                >
+                  ↻
                 </button>
               </div>
 

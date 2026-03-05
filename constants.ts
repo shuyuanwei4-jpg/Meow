@@ -179,7 +179,8 @@ export const STORY_DATA = [
       en: "Snow belongs to the owner of the bubble tea shop downstairs. She grew up being petted by everyone and lets anyone hold her. The owner brings her for a bath every month. She purrs with her eyes closed while bathing.\n\nShe isn't a stray—but she is the reason you opened this shop.\n\nLast winter, you found a muddy little white cat by the roadside. It was her. You took her in, cleaned her up, and returned her to the owner. The owner said, \"Why don't you open a cat bathhouse?\"\n\nAnd so, \"Furry Bathhouse\" was born."
     },
     unlockText: { zh: "每一个故事都有一个起点。小白是我们的。", en: "Every story has a beginning. Snow is ours." },
-    egg: { zh: "洗澡过程中，背景里能看到奶茶店的招牌在窗外闪烁。", en: "During the bath, the bubble tea shop sign flickers outside the window." }
+    egg: { zh: "洗澡过程中，背景里能看到奶茶店的招牌在窗外闪烁。", en: "During the bath, the bubble tea shop sign flickers outside the window." },
+    realImage: "https://images.unsplash.com/photo-1517331156700-3c241d2b4d83?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 2,
@@ -193,7 +194,8 @@ export const STORY_DATA = [
       en: "He has lived in this neighborhood for three years, and everyone knows him. The lady at the convenience store saves sausages for him, and the grandpa walking his dog chases other cats away for him. He's as fat as an orange ball.\n\nHe used to have a home. Three years ago, during moving season, his owner left a bowl of food and an open door, and never came back.\n\nMarmalade waited by that door for seven days.\n\nEventually, he learned not to wait. He learned to act cute at the store, find dinner near trash cans, and hide under cars when it rains.\n\nToday, a volunteer brought him in. He's scared, but you have treats—and for an orange cat, that is irresistible."
     },
     unlockText: { zh: "他不是不想要家，他只是不敢再相信'家'这个字了。", en: "It's not that he doesn't want a home. He's just afraid to believe in the word 'home' again." },
-    egg: { zh: "背景角落里有一碗猫粮和一扇打开的门的涂鸦。", en: "In the background corner, there's a doodle of a food bowl and an open door." }
+    egg: { zh: "背景角落里有一碗猫粮和一扇打开的门的涂鸦。", en: "In the background corner, there's a doodle of a food bowl and an open door." },
+    realImage: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 3,
@@ -207,7 +209,8 @@ export const STORY_DATA = [
       en: "Three months ago, volunteers and animal control shut down an illegal breeding facility. Over forty cats were rescued, and Tiger was one of them.\n\nHe grew up in a wire cage, never touching grass, never feeling the sun. Everything outside the cage is unknown and dangerous to him.\n\nHis ears are always perked, his eyes always darting. Not because he's mean—but because in his world, \"safety\" never existed.\n\nBathing him requires patience. He might jump or swat at you. But if you are gentle and slow, he will eventually lower his ears."
     },
     unlockText: { zh: "信任是一厘米一厘米建立的。他走出笼子的每一步都很勇敢。", en: "Trust is built inch by inch. Every step he takes out of the cage is brave." },
-    egg: { zh: "关卡开始时背景能看到一个铁笼的轮廓，洗完后铁笼消失，变成了一扇窗户，窗外有阳光。", en: "At the start, a cage outline is visible. By the end, it fades into a window with sunlight." }
+    egg: { zh: "关卡开始时背景能看到一个铁笼的轮廓，洗完后铁笼消失，变成了一扇窗户，窗外有阳光。", en: "At the start, a cage outline is visible. By the end, it fades into a window with sunlight." },
+    realImage: "https://images.unsplash.com/photo-1519052537078-e6302a4968ef?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 4,
@@ -221,7 +224,8 @@ export const STORY_DATA = [
       en: "Grandma Wang is 82. Last month she fell and was hospitalized for a long stay. Her biggest worry wasn't herself, but Patches.\n\n\"She only eats the chicken breast I boil.\"\n\"She sleeps by my pillow, or she cries.\"\n\"She doesn't like strangers, please be slow...\"\n\nWhen her son brought Patches in, the cat meowed at the door for twenty minutes. She doesn't understand why the world changed, or where the person who brushed her every day went.\n\nPatches is grumpy not because she's bad, but because she misses someone."
     },
     unlockText: { zh: "她不是难搞。她只是还在等那个，把她抱在怀里轻声说'乖'的人。", en: "She's not difficult. She's just waiting for the one who holds her and whispers 'good girl'." },
-    egg: { zh: "背景墙上挂着一张老人和猫的合照（像素画/简笔画风格）。洗完澡后三花叫了一声，文字气泡显示：\"……喵？\"（像在问：她什么时候来接我？）", en: "A photo of an elder and a cat hangs on the wall. After the bath, Patches meows: \"...Meow?\" (As if asking: When is she coming?)" }
+    egg: { zh: "背景墙上挂着一张老人和猫的合照（像素画/简笔画风格）。洗完澡后三花叫了一声，文字气泡显示：\"……喵？\"（像在问：她什么时候来接我？）", en: "A photo of an elder and a cat hangs on the wall. After the bath, Patches meows: \"...Meow?\" (As if asking: When is she coming?)" },
+    realImage: "https://images.unsplash.com/photo-1513245543132-31f507417b26?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 5,
@@ -235,7 +239,8 @@ export const STORY_DATA = [
       en: "First time: \"Black cats are bad luck.\"\nSecond time: \"She's too timid, not fun.\"\nThird time: \"I'm moving, no pets allowed.\"\n\nThree times returned, three times in a carrier, three times watching a door close.\n\nMidnight shakes when she hears a carrier now. She curls into a black ball, watching you with big golden eyes—not in anger, but in fear.\n\nShe's asking: Will you send me back too?\n\nPlease be gentle. The world has scared her enough."
     },
     unlockText: { zh: "黑色不是不吉利。是星空的颜色，是夜晚拥抱你的颜色。", en: "Black isn't bad luck. It's the color of the stars, the color of the night hugging you." },
-    egg: { zh: "洗澡过程中如果有一段时间不操作（不碰她），小黑会慢慢把蜷缩的身体展开。背景从阴暗角落渐变成温暖的灯光。", en: "If left alone for a moment, Midnight uncurls. The background shifts from dark to warm light." }
+    egg: { zh: "洗澡过程中如果有一段时间不操作（不碰她），小黑会慢慢把蜷缩的身体展开。背景从阴暗角落渐变成温暖的灯光。", en: "If left alone for a moment, Midnight uncurls. The background shifts from dark to warm light." },
+    realImage: "https://images.unsplash.com/photo-1543852786-1cf6624b9987?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 6,
@@ -249,7 +254,8 @@ export const STORY_DATA = [
       en: "No one knows when he appeared. Workers only know that at 6:30 AM, this black and white cat waits for a bite of lunch.\n\nHe rules the stray cats—who eats first, who sleeps in the warmest box. They call him \"Sheriff\".\n\nLast month, bulldozers arrived. Other cats ran, but Sheriff stood his ground, growling at the machine, protecting his turf.\n\nThe foreman watched him for a long time, then made a call: \"Hey, what's the number for animal rescue?\"\n\nSheriff is here for a bath. He fights not out of fear, but because he is the Sheriff, and he demands respect."
     },
     unlockText: { zh: "他守护了整个工地的猫，现在轮到我们守护他了。", en: "He protected all the cats at the site. Now it's our turn to protect him." },
-    egg: { zh: "背景窗户能看到微缩的建筑工地元素（安全帽、推土机轮廓）。洗完后警长昂首挺胸的pose不变——即使浑身湿漉漉的也要保持\"老大\"的尊严。", en: "Construction elements visible in the window. After the bath, Sheriff stands tall—maintaining his dignity even when wet." }
+    egg: { zh: "背景窗户能看到微缩的建筑工地元素（安全帽、推土机轮廓）。洗完后警长昂首挺胸的pose不变——即使浑身湿漉漉的也要保持\"老大\"的尊严。", en: "Construction elements visible in the window. After the bath, Sheriff stands tall—maintaining his dignity even when wet." },
+    realImage: "https://images.unsplash.com/photo-1586289883499-f11d280003f6?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 7,
@@ -263,7 +269,8 @@ export const STORY_DATA = [
       en: "He lived under that bridge for two years. His fur was matted, he had old scars, and his left ear was chipped from fights.\n\nCovered in dust and mud, volunteers called him \"Smudge\".\n\nIt took three days to catch him. On the third day, hunger drove him into the trap.\n\nHe has no hate for humans, nor love. He just doesn't understand: What do you want?\n\nTwo years without touch. Warm water, hands, shampoo—these are alien to him.\n\nHe hisses and arches his back. But he doesn't scratch. Because deep in his memory, he remembers a warm hand."
     },
     unlockText: { zh: "两年的流浪，让他忘了被爱的感觉。但身体还记得。", en: "Two years of wandering made him forget love. But his body remembers." },
-    egg: { zh: "洗澡过程中，挖煤身上的\"泥垢\"被洗掉后，露出的皮毛颜色比一开始亮了很多，他原来不是黑色的，是深棕色。背景从灰暗的桥洞渐变成温暖的室内。", en: "As mud washes off, his fur reveals a deep brown color. The background shifts from a bridge to a warm room." }
+    egg: { zh: "洗澡过程中，挖煤身上的\"泥垢\"被洗掉后，露出的皮毛颜色比一开始亮了很多，他原来不是黑色的，是深棕色。背景从灰暗的桥洞渐变成温暖的室内。", en: "As mud washes off, his fur reveals a deep brown color. The background shifts from a bridge to a warm room." },
+    realImage: "https://images.unsplash.com/photo-1511044568932-338cba0ad803?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 8,
@@ -277,7 +284,8 @@ export const STORY_DATA = [
       en: "Found in a box at the vet. The note read: \"I can't afford him. Sorry.\"\n\nCurly's fur was severely matted, tight against his skin. The vet said he hadn't been brushed in months.\n\nMats pull on the skin, causing pain with every step. Like wearing a suit of thorns.\n\nHis owner gave up long before leaving him there.\n\nCurly needs a bath and a shave. It's painful, but with every mat cut, he gets lighter. Not just in weight, but in burden."
     },
     unlockText: { zh: "养一只猫是承诺，不是尝试。但没关系，现在换我们来承诺。", en: "Owning a cat is a promise. It's okay, now we make that promise." },
-    egg: { zh: "洗澡过程中每解开/洗掉一个\"毛结区域\"，会有一小段文字闪过，像是旧主人的内心独白碎片。洗完后这些文字全部消失，只剩下一句：\"现在你很漂亮了，卷毛。\"", en: "Flashbacks of the old owner's thoughts appear as mats are removed. At the end, only: \"You are beautiful now, Curly.\"" }
+    egg: { zh: "洗澡过程中每解开/洗掉一个\"毛结区域\"，会有一小段文字闪过，像是旧主人的内心独白碎片。洗完后这些文字全部消失，只剩下一句：\"现在你很漂亮了，卷毛。\"", en: "Flashbacks of the old owner's thoughts appear as mats are removed. At the end, only: \"You are beautiful now, Curly.\"" },
+    realImage: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 9,
@@ -291,7 +299,8 @@ export const STORY_DATA = [
       en: "She is a Sphynx—sold as a \"luxury breed\". She was bred five times, birthing nineteen kittens. When she couldn't breed anymore, she had \"no value\".\n\nRescuers saved her just in time.\n\nWithout fur, her skin is scarred and sensitive. She needs baths for her oils, but the water must be perfect.\n\nShe doesn't hiss or struggle. She just watches you with amber eyes.\n\nIn the mill, silence was survival.\n\nBut that silence isn't trust, it's resignation.\n\nWe need to teach her: Silence can also mean peace."
     },
     unlockText: { zh: "她被当作商品活了五年。从今天起，她是一只猫，只是一只猫。这就够了。", en: "She lived as a product for five years. From today, she is just a cat. That is enough." },
-    egg: { zh: "洗澡过程中，如果操作特别轻柔（慢速、不出错），无毛会慢慢闭上眼睛，这是整个游戏里唯一一只会在洗澡时闭眼睛的猫。", en: "If you are very gentle, she closes her eyes—the only cat in the game to do so." }
+    egg: { zh: "洗澡过程中，如果操作特别轻柔（慢速、不出错），无毛会慢慢闭上眼睛，这是整个游戏里唯一一只会在洗澡时闭眼睛的猫。", en: "If you are very gentle, she closes her eyes—the only cat in the game to do so." },
+    realImage: "https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?q=80&w=1000"
   },
   {
     id: 10,
@@ -305,7 +314,8 @@ export const STORY_DATA = [
       en: "Maine was loved. His owner, Lin, raised him for eight years. She brushed him daily and called him \"my son\".\n\nLast month, Lin was hospitalized indefinitely. She didn't know if she could keep him.\n\nShe wrote a four-page manual:\n\n\"He eats at 6 AM.\"\n\"He's scared of thunder.\"\n\"He loves chin scratches.\"\n\"He acts tough in the bath, but won't bite.\"\n\"He is the best cat in the world.\"\n\"Please find him a good home.\"\n\nLin didn't cry when she dropped him off. She hugged him tight, whispered to him, and let go.\n\nMaine looked back three times.\n\nHe fights the bath not because he's mad, but because he thinks: If I'm bad, maybe they won't adopt me out. Maybe I can stay here until Lin comes back.\n\n...Maine, you don't know this, but Lin calls every day to check on you."
     },
     unlockText: { zh: "不是所有的分别都是遗弃。有些放手，是因为太爱了。\n小林，缅因洗好了。他很乖。他在等你。", en: "Not all goodbyes are abandonment. Some let go because they love too much.\nLin, Maine is clean. He's waiting." },
-    egg: { zh: "这是唯一一关通关后会出现额外动画的关卡。洗完澡后，画面慢慢淡出，出现一张手机屏幕的画面——是小林发来的微信消息：\"今天的检查结果出来了。医生说情况比想象的好。❤️\" \"等我好了，第一件事就是来接他。\" \"谢谢你们。\"", en: "After the bath, a phone screen appears. A message from Lin: \"Doctor says I'm improving. ❤️ I'll come for him as soon as I'm well. Thank you.\"" }
+    egg: { zh: "这是唯一一关通关后会出现额外动画的关卡。洗完澡后，画面慢慢淡出，出现一张手机屏幕的画面——是小林发来的微信消息：\"今天的检查结果出来了。医生说情况比想象的好。❤️\" \"等我好了，第一件事就是来接他。\" \"谢谢你们。\"", en: "After the bath, a phone screen appears. A message from Lin: \"Doctor says I'm improving. ❤️ I'll come for him as soon as I'm well. Thank you.\"" },
+    realImage: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?q=80&w=1000&auto=format&fit=crop"
   }
 ];
 
