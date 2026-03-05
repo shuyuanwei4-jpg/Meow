@@ -618,6 +618,29 @@ class AudioService {
     });
   }
 
+  playPop() {
+    if (!this.ctx || !this.masterGain || this.isMuted) return;
+    this.resume();
+    
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    
+    osc.type = 'sine';
+    
+    // Quick pitch drop for a "pop" sound
+    osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.1);
+    
+    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+    
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.1);
+  }
+
   playLoveSound() {
     if (!this.ctx || !this.masterGain || this.isMuted) return;
     this.resume();

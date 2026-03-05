@@ -7,6 +7,8 @@ import {
   CAT_RADIUS, 
   BATHTUB, 
   MOBILE_BATHTUB,
+  LITTER_BOX,
+  MOBILE_LITTER_BOX,
   FOOD_BOWL,
   MOBILE_FOOD_BOWL,
   MAX_HP, 
@@ -86,6 +88,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
   const GAME_WIDTH = isMobile ? MOBILE_CANVAS_WIDTH : CANVAS_WIDTH;
   const GAME_HEIGHT = isMobile ? MOBILE_CANVAS_HEIGHT : CANVAS_HEIGHT;
   const CURRENT_BATHTUB = isMobile ? MOBILE_BATHTUB : BATHTUB;
+  const CURRENT_LITTER_BOX = isMobile ? MOBILE_LITTER_BOX : LITTER_BOX;
   const CURRENT_FOOD_BOWL = isMobile ? MOBILE_FOOD_BOWL : FOOD_BOWL;
   
   // Game State
@@ -97,11 +100,15 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
     mode: 'idle',
     angle: 0,
     scale: isMobile ? 1.5 : 1, // Start bigger on mobile
-    state: levelData.initialState.state,
-    hunger: levelData.initialState.hunger,
-    dirtiness: levelData.initialState.dirtiness,
-    grumpiness: levelData.initialState.grumpiness
+    state: levelData.stateSequence[0] || 'normal',
+    hunger: 0, // Deprecated but kept for type compatibility
+    dirtiness: 0, // Deprecated
+    grumpiness: 0 // Deprecated
   });
+
+  const taskQueueRef = useRef<CatState[]>([...levelData.stateSequence]);
+  const angryTimerRef = useRef<number>(0);
+  const ANGRY_LIMIT = 600 + (levelData.difficulty * 60); // Frames before getting angry (approx 10s + level*1s)
 
   const itemsRef = useRef<GameItem[]>([]);
   const dragTargetRef = useRef<{ type: 'cat' | 'item', id?: number, offsetX: number, offsetY: number } | null>(null);
@@ -146,6 +153,8 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
   // Rolling ending state
   const isRollingAwayRef = useRef<boolean>(false);
 
+  const scrubProgressRef = useRef<number>(0);
+
   // Initialize Items
   useEffect(() => {
     const newItems: GameItem[] = [];
@@ -167,10 +176,10 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
     itemsRef.current = newItems;
     
     // Reset Cat State
-    catRef.current.state = levelData.initialState.state;
-    catRef.current.hunger = levelData.initialState.hunger;
-    catRef.current.dirtiness = levelData.initialState.dirtiness;
-    catRef.current.grumpiness = levelData.initialState.grumpiness;
+    taskQueueRef.current = [...levelData.stateSequence];
+    catRef.current.state = taskQueueRef.current[0] || 'normal';
+    angryTimerRef.current = 0;
+    scrubProgressRef.current = 0;
     
   }, [levelData, GAME_WIDTH, GAME_HEIGHT]);
 
@@ -300,31 +309,42 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
          ctx.beginPath(); ctx.arc(-5, 10, 3, 0, Math.PI*2); ctx.fill();
          ctx.beginPath(); ctx.arc(8, -10, 3, 0, Math.PI*2); ctx.fill();
       } else if (type === 'brush') {
-         // Brush
-         ctx.rotate(-0.5);
-         ctx.fillStyle = '#8e44ad'; // Handle
-         ctx.fillRect(-10, 0, 20, 30);
-         ctx.strokeRect(-10, 0, 20, 30);
-         // Bristles
-         ctx.fillStyle = '#ecf0f1';
-         ctx.beginPath();
-         ctx.rect(-15, -20, 30, 20);
+         // Oval Scrub Brush
+         ctx.rotate(0.2);
+         
+         // Helper for rounded rect
+         const roundRect = (x: number, y: number, w: number, h: number, r: number) => {
+             ctx.beginPath();
+             ctx.moveTo(x + r, y);
+             ctx.lineTo(x + w - r, y);
+             ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+             ctx.lineTo(x + w, y + h - r);
+             ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+             ctx.lineTo(x + r, y + h);
+             ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+             ctx.lineTo(x, y + r);
+             ctx.quadraticCurveTo(x, y, x + r, y);
+             ctx.closePath();
+         };
+
+         // Bristles (Bottom)
+         ctx.fillStyle = '#fdf5e6'; // Off-white
+         roundRect(-25, 5, 50, 15, 2);
          ctx.fill(); ctx.stroke();
-         // Bristle lines
-         ctx.strokeStyle = '#bdc3c7';
-         for(let i=-12; i<15; i+=4) {
-             ctx.beginPath(); ctx.moveTo(i, -20); ctx.lineTo(i, 0); ctx.stroke();
-         }
-      } else if (type === 'towel') {
-         // Folded Towel
-         ctx.fillStyle = '#1abc9c';
-         ctx.beginPath();
-         ctx.moveTo(-20, -15); ctx.lineTo(20, -15); ctx.lineTo(25, 15); ctx.lineTo(-15, 15); ctx.closePath();
+         
+         // Wood Base (Top)
+         ctx.fillStyle = '#d7ccc8'; // Light wood
+         roundRect(-28, -10, 56, 20, 8);
          ctx.fill(); ctx.stroke();
-         // Folds
-         ctx.strokeStyle = '#16a085';
-         ctx.beginPath(); ctx.moveTo(-20, -15); ctx.quadraticCurveTo(-10, 0, -15, 15); ctx.stroke();
-         ctx.beginPath(); ctx.moveTo(0, -15); ctx.quadraticCurveTo(10, 0, 5, 15); ctx.stroke();
+         
+         // Strap
+         ctx.fillStyle = '#8d6e63'; // Darker strap
+         ctx.beginPath();
+         ctx.moveTo(-20, -5); 
+         ctx.quadraticCurveTo(0, -25, 20, -5);
+         ctx.lineTo(20, 5);
+         ctx.quadraticCurveTo(0, -15, -20, 5);
+         ctx.fill(); ctx.stroke();
       } else if (type === 'scissors') {
          // Scissors
          ctx.rotate(0.5);
@@ -341,7 +361,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
          ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI*2); ctx.fill();
       } else if (type === 'toy') {
          // Mouse Toy
-         ctx.fillStyle = '#95a5a6';
+         ctx.fillStyle = '#e67e22'; // Orange Mouse
          ctx.beginPath();
          ctx.ellipse(0, 0, 15, 20, 0, 0, Math.PI*2);
          ctx.fill(); ctx.stroke();
@@ -349,7 +369,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
          ctx.beginPath(); ctx.arc(-10, -15, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
          ctx.beginPath(); ctx.arc(10, -15, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
          // Tail
-         ctx.strokeStyle = '#7f8c8d';
+         ctx.strokeStyle = '#d35400';
          ctx.beginPath(); ctx.moveTo(0, 20); ctx.quadraticCurveTo(10, 30, 5, 40); ctx.stroke();
       } else if (type === 'catnip') {
          // Catnip Bag
@@ -368,11 +388,11 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
          ctx.beginPath(); ctx.moveTo(-15, -15); ctx.lineTo(15, -15); ctx.stroke();
       }
       
-      // Label
-      ctx.fillStyle = '#2d2d2d';
-      ctx.font = '12px "Chewy"';
-      ctx.textAlign = 'center';
-      ctx.fillText(data.label, 0, height/2 + 15);
+      // Label removed as requested
+      // ctx.fillStyle = '#2d2d2d';
+      // ctx.font = '12px "Chewy"';
+      // ctx.textAlign = 'center';
+      // ctx.fillText(data.label, 0, height/2 + 15);
 
       ctx.restore();
     });
@@ -547,6 +567,63 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
     ctx.fillStyle = '#fff';
     ctx.font = '12px "Chewy"';
     ctx.fillText("YUM", -12, 15);
+    ctx.restore();
+  };
+
+  const drawLitterBox = (ctx: CanvasRenderingContext2D) => {
+    ctx.save();
+    const { x, y, width, height } = CURRENT_LITTER_BOX;
+    
+    // Toilet Shape Base (White Ceramic)
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#bdc3c7'; // Light grey outline
+    ctx.lineWidth = 2;
+    
+    // Draw base
+    ctx.beginPath();
+    ctx.roundRect(x, y + 20, width, height - 20, 20);
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw Rim
+    ctx.fillStyle = '#ecf0f1';
+    ctx.beginPath();
+    ctx.roundRect(x - 5, y + 15, width + 10, 20, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw "Litter" (Sand) inside
+    ctx.fillStyle = '#d7ccc8'; // Sand color
+    ctx.beginPath();
+    ctx.ellipse(x + width/2, y + height/2 + 10, width/2 - 15, height/3, 0, 0, Math.PI*2);
+    ctx.fill();
+    
+    // Grains
+    ctx.fillStyle = '#a1887f';
+    for(let i=0; i<10; i++) {
+        const rx = (Math.random() - 0.5) * (width - 40);
+        const ry = (Math.random() - 0.5) * (height - 60);
+        ctx.beginPath(); ctx.arc(x + width/2 + rx, y + height/2 + 10 + ry, 2, 0, Math.PI*2); ctx.fill();
+    }
+
+    // Tank (Back part)
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#bdc3c7';
+    ctx.beginPath();
+    ctx.roundRect(x + width/2 - 40, y - 40, 80, 60, 10);
+    ctx.fill();
+    ctx.stroke();
+    
+    // Flush Handle
+    ctx.fillStyle = '#95a5a6';
+    ctx.beginPath();
+    ctx.arc(x + width/2 + 30, y - 30, 5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + width/2 + 30, y - 30);
+    ctx.lineTo(x + width/2 + 45, y - 30);
+    ctx.stroke();
+
     ctx.restore();
   };
 
@@ -940,6 +1017,74 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
 
     // Draw State Icon
     if (cat.state !== 'normal' && cat.mode !== 'caught' && winSequenceRef.current === 0) {
+        // Visuals for states
+        if (cat.state === 'long_hair') {
+            // Draw messy hair
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2;
+            for(let i=0; i<8; i++) {
+                const angle = (Math.PI * 2 / 8) * i;
+                const lx = Math.cos(angle) * (CAT_RADIUS + 10);
+                const ly = Math.sin(angle) * (CAT_RADIUS + 10);
+                drawCrayonLine(ctx, Math.cos(angle)*CAT_RADIUS, Math.sin(angle)*CAT_RADIUS, lx, ly, strokeColor, 2);
+            }
+        } else if (cat.state === 'tangled') {
+            // Draw knots
+            ctx.fillStyle = '#8e44ad';
+            for(let i=0; i<3; i++) {
+                const kx = (Math.random()-0.5) * 40;
+                const ky = (Math.random()-0.5) * 30;
+                ctx.beginPath(); ctx.arc(kx, ky, 5, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth=1; ctx.stroke();
+            }
+        } else if (cat.state === 'dirty') {
+            // Mud Splotches
+            // Opacity based on scrub progress (inverse)
+            const opacity = 1 - (scrubProgressRef.current / 100);
+            if (opacity > 0) {
+                ctx.globalAlpha = opacity;
+                ctx.fillStyle = '#5d4037'; // Mud brown
+                
+                // Draw random splotches
+                const splotches = [
+                    {x: -20, y: -10, r: 15},
+                    {x: 15, y: 5, r: 12},
+                    {x: 0, y: -25, r: 10},
+                    {x: 10, y: 20, r: 8},
+                    {x: -15, y: 25, r: 10}
+                ];
+                
+                splotches.forEach(s => {
+                    ctx.beginPath();
+                    // Irregular shape
+                    ctx.moveTo(s.x, s.y - s.r);
+                    for(let i=0; i<7; i++) {
+                        const angle = (Math.PI * 2 / 6) * i;
+                        const r = s.r + (i%2===0 ? 3 : -2);
+                        ctx.lineTo(s.x + Math.cos(angle)*r, s.y + Math.sin(angle)*r);
+                    }
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1.0;
+            }
+        } else if (cat.state === 'needs_poop') {
+            // Stink lines
+            ctx.strokeStyle = '#27ae60';
+            ctx.lineWidth = 2;
+            for(let i=0; i<3; i++) {
+                const sx = (i-1) * 15;
+                ctx.beginPath();
+                ctx.moveTo(sx, -50);
+                ctx.quadraticCurveTo(sx + 5, -60, sx, -70);
+                ctx.stroke();
+            }
+        } else if (cat.state === 'bored') {
+            // Zzz
+            ctx.fillStyle = '#3498db';
+            ctx.font = '20px Arial';
+            ctx.fillText('Zzz...', 30, -40);
+        }
+
         ctx.save();
         ctx.translate(0, -70);
         const iconScale = 1.0 + Math.sin(frameCount.current * 0.1) * 0.1;
@@ -958,8 +1103,12 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
         ctx.textBaseline = 'middle';
         let icon = '';
         if (cat.state === 'hungry') icon = '🍖';
-        else if (cat.state === 'dirty') icon = '💩';
-        else if (cat.state === 'grumpy') icon = '💢';
+        else if (cat.state === 'dirty') icon = '💩'; // Legacy
+        else if (cat.state === 'grumpy') icon = '💢'; // Legacy
+        else if (cat.state === 'long_hair') icon = '✂️';
+        else if (cat.state === 'tangled') icon = '🧶';
+        else if (cat.state === 'needs_poop') icon = '💩';
+        else if (cat.state === 'bored') icon = '🐭';
         
         ctx.fillText(icon, 0, 2);
         ctx.restore();
@@ -999,7 +1148,8 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
       const cat = catRef.current;
       const distCat = Math.hypot(x - cat.x, y - cat.y);
       if (distCat < CAT_RADIUS * cat.scale + 20) {
-          if (cat.state !== 'normal') {
+          // Allow grabbing if normal OR needs_poop (to move to litter box)
+          if (cat.state !== 'normal' && cat.state !== 'needs_poop') {
               audio.playHiss();
               cat.vx = (Math.random() - 0.5) * 20;
               cat.vy = (Math.random() - 0.5) * 20;
@@ -1041,6 +1191,26 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
               if (item) {
                   item.x = clampedX - dragTargetRef.current.offsetX;
                   item.y = clampedY - dragTargetRef.current.offsetY;
+
+                  // Scrubbing Logic
+                  if (item.type === 'brush' && catRef.current.state === 'dirty') {
+                      const cat = catRef.current;
+                      const dist = Math.hypot(item.x - cat.x, item.y - cat.y);
+                      if (dist < CAT_RADIUS * cat.scale + 40) {
+                          // Scrubbing!
+                          scrubProgressRef.current += 1.5; // Speed of cleaning
+                          if (frameCount.current % 5 === 0) {
+                              spawnParticles(item.x, item.y - 20, '#a5d8ff', 2, 'bubble'); // Bubbles from brush
+                          }
+                          
+                          if (scrubProgressRef.current >= 100) {
+                              scrubProgressRef.current = 0;
+                              advanceTask();
+                              spawnParticles(cat.x, cat.y, '#fff', 20, 'sparkle');
+                              audio.playSplash(); // Clean sound
+                          }
+                      }
+                  }
               }
           } else if (dragTargetRef.current.type === 'cat') {
               const cat = catRef.current;
@@ -1067,6 +1237,25 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
           } else if (dragTargetRef.current.type === 'cat') {
               const cat = catRef.current;
               cat.mode = 'idle'; // Release
+              
+              // Check Drop in Litter Box
+              if (
+                  cat.x > CURRENT_LITTER_BOX.x && 
+                  cat.x < CURRENT_LITTER_BOX.x + CURRENT_LITTER_BOX.width && 
+                  cat.y > CURRENT_LITTER_BOX.y && 
+                  cat.y < CURRENT_LITTER_BOX.y + CURRENT_LITTER_BOX.height
+              ) {
+                  if (cat.state === 'needs_poop') {
+                      audio.playPop(); // Flush sound?
+                      spawnParticles(cat.x, cat.y, '#8d6e63', 10, 'sparkle');
+                      generateCatThought('happy', hpRef.current, language).then(setCatThought);
+                      advanceTask();
+                  } else {
+                      audio.playHiss();
+                      cat.vx = 10; cat.vy = -10; // Jump out
+                  }
+              }
+
               // Check Drop in Tub
               if (
                   cat.x > CURRENT_BATHTUB.x && 
@@ -1074,7 +1263,12 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
                   cat.y > CURRENT_BATHTUB.y && 
                   cat.y < CURRENT_BATHTUB.y + CURRENT_BATHTUB.height
               ) {
-                  if (cat.state === 'normal') {
+                  if (cat.state === 'needs_poop') {
+                      // Cannot drop in tub if needs poop
+                      audio.playHiss();
+                      cat.vx = -15; cat.vy = -10; // Jump out aggressively
+                      generateCatThought('angry', hpRef.current, language).then(setCatThought);
+                  } else if (cat.state === 'normal') {
                       audio.playSplash();
                       audio.playWinAscending(); 
                       winSequenceRef.current = 180; 
@@ -1087,29 +1281,59 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
       }
   };
 
+  const advanceTask = () => {
+      // Remove current task
+      taskQueueRef.current.shift();
+      const nextTask = taskQueueRef.current[0];
+      if (nextTask) {
+          catRef.current.state = nextTask;
+          angryTimerRef.current = 0; // Reset angry timer for new task
+          audio.playTrill();
+      } else {
+          catRef.current.state = 'normal';
+          audio.playTrill();
+          generateCatThought('happy', hpRef.current, language).then(setCatThought);
+      }
+  };
+
   const handleItemDropOnCat = (item: GameItem, cat: CatEntity) => {
       let success = false;
-      if (cat.state === 'hungry' && item.category === 'food') {
-          cat.hunger -= 50;
-          if (cat.hunger <= 0) { cat.state = 'normal'; cat.hunger = 0; }
+      
+      if (cat.state === 'long_hair' && item.type === 'scissors') {
           success = true;
-      } else if (cat.state === 'dirty' && item.category === 'cleaning') {
-          cat.dirtiness -= 50;
-          if (cat.dirtiness <= 0) { cat.state = 'normal'; cat.dirtiness = 0; }
+          // Spawn hair particles
+          spawnParticles(cat.x, cat.y, catType === 'white' ? '#eee' : '#333', 15);
+      } else if (cat.state === 'tangled' && item.type === 'brush') {
+          // Changed: Brush is now for dirty (mud), but maybe still for tangled?
+          // User request specifically said brush is for mud. 
+          // Let's assume tangled needs brush too, or maybe scissors? 
+          // Previous logic used brush for tangled. Let's keep it but maybe add scrubbing requirement for tangled too?
+          // For simplicity, let's keep instant fix for tangled for now, or make it require scrubbing too.
+          // But user emphasized mud.
           success = true;
-      } else if (cat.state === 'grumpy' && item.category === 'toy') {
-          cat.grumpiness -= 50;
-          if (cat.grumpiness <= 0) { cat.state = 'normal'; cat.grumpiness = 0; }
+          audio.playMeow();
+      } else if (cat.state === 'bored' && item.type === 'toy') {
+          success = true;
+          cat.vx = (Math.random()-0.5)*10; cat.vy = (Math.random()-0.5)*10; cat.mode = 'run';
+      } else if (cat.state === 'hungry' && item.category === 'food') {
+          // Legacy support or bonus
+          cat.scale += 0.1;
           success = true;
       }
+      // Dirty state is handled by scrubbing in handlePointerMove, not drop.
 
       if (success) {
-          audio.playEat(); 
+          if (cat.state !== 'hungry') advanceTask(); // Don't advance task for food unless it was a task (it's not in new levels)
+          
+          audio.playEat(); // Or generic success sound
           spawnParticles(cat.x, cat.y, '#fff', 10, 'sparkle');
-          itemsRef.current = itemsRef.current.filter(i => i.id !== item.id);
-          if (cat.state === 'normal') {
-              audio.playTrill();
-              generateCatThought('happy', hpRef.current, language).then(setCatThought);
+          // Don't remove tools, only food
+          if (item.category === 'food') {
+             itemsRef.current = itemsRef.current.filter(i => i.id !== item.id);
+          } else {
+             // Bounce tool away
+             item.x += (Math.random()-0.5)*100;
+             item.y += (Math.random()-0.5)*100;
           }
       } else {
           audio.playHiss();
@@ -1209,8 +1433,21 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
       oCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
       drawRoom(ctx);
+      drawLitterBox(ctx); // Add Litter Box
       drawItems(ctx); 
       drawFoodBowl(ctx);
+      
+      // Angry Timer Logic
+      if (catRef.current.state !== 'normal' && winSequenceRef.current === 0 && catRef.current.mode !== 'manic') {
+          angryTimerRef.current++;
+          if (angryTimerRef.current > ANGRY_LIMIT) {
+              catRef.current.mode = 'manic';
+              audio.playHiss();
+              generateCatThought('angry', hpRef.current, language).then(setCatThought);
+          }
+      } else if (catRef.current.state === 'normal') {
+          angryTimerRef.current = 0;
+      }
       
       if (winSequenceRef.current > 0) {
         winSequenceRef.current--;

@@ -2,9 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import GameEngine from './components/GameEngine';
 import { GameState, CatType, Language, GameOverReason } from './types';
 import { audio } from './services/audioService';
-import { TRANSLATIONS, LEVELS, LevelData } from './constants';
+import { TRANSLATIONS, LEVELS, LevelData, STORY_DATA } from './constants';
+import SettingsCatAnimation from './components/SettingsCatAnimation';
 
-// Mini component to draw the Start Screen Cat (Default White)
+// ... (StartCat component remains same)
+
+// StartCat Component
 const StartCat: React.FC<{ meowText: string }> = ({ meowText }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
@@ -84,7 +87,6 @@ const StartCat: React.FC<{ meowText: string }> = ({ meowText }) => {
       if (f % 200 < 60) {
         ctx.fillStyle = '#2d2d2d';
         ctx.font = '24px "Chewy"';
-        // Add minimal outline for better readability
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 4;
         ctx.strokeText(meowText, 50, -60);
@@ -100,6 +102,158 @@ const StartCat: React.FC<{ meowText: string }> = ({ meowText }) => {
   return <canvas ref={canvasRef} width={300} height={200} className="mx-auto" />;
 };
 
+// Helper for Cat Styles
+const getCatStyle = (t: CatType) => {
+  switch(t) {
+    case 'white': return { background: '#fff' };
+    case 'black': return { background: '#2d2d2d' };
+    case 'tuxedo': return { background: 'linear-gradient(135deg, #2d2d2d 50%, #fff 50%)' };
+    case 'calico': return { background: 'radial-gradient(circle at 30% 30%, #ffa94d 20%, transparent 25%), radial-gradient(circle at 70% 60%, #2d2d2d 20%, transparent 25%), #fff' };
+    case 'siamese': return { background: 'radial-gradient(circle, #4b3621 30%, #fdf5e6 70%)' }; 
+    case 'devon': return { background: '#a0a0a0' }; // Pure Grey
+    case 'orange': return { background: 'repeating-linear-gradient(45deg, #ffb74d, #ffb74d 10px, #e67e22 10px, #e67e22 20px)' }; 
+    case 'sphynx': return { background: '#f5cba7' }; 
+    case 'tabby': return { background: 'repeating-linear-gradient(45deg, #bdc3c7, #bdc3c7 10px, #2c3e50 10px, #2c3e50 20px)' }; 
+    case 'maine_coon': return { background: 'linear-gradient(135deg, #3e2723 0%, #795548 50%, #d7ccc8 100%)' };
+    default: return { background: '#fff' };
+  }
+};
+
+// Gallery Modal Component
+const GalleryModal: React.FC<{
+  unlockedLevels: number[];
+  onClose: () => void;
+  language: Language;
+  onViewStory: (id: number) => void;
+}> = ({ unlockedLevels, onClose, language, onViewStory }) => {
+  const t = TRANSLATIONS[language];
+  
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-[#fffdf5] w-[95%] max-w-4xl h-[85vh] rounded-3xl border-[6px] border-[#2d2d2d] shadow-2xl relative flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="bg-[#ffec99] p-4 border-b-4 border-[#2d2d2d] flex justify-between items-center">
+           <h2 className="text-2xl md:text-3xl font-bold text-[#2d2d2d]">{t.gallery}</h2>
+           <button onClick={onClose} className="text-2xl font-bold hover:scale-110">✖️</button>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+           {STORY_DATA.map((story) => {
+             const isUnlocked = unlockedLevels.includes(story.id);
+             const level = LEVELS.find(l => l.id === story.id);
+             const catStyle = level ? getCatStyle(level.catType) : {};
+             
+             return (
+               <div 
+                 key={story.id}
+                 onClick={() => isUnlocked && onViewStory(story.id)}
+                 className={`relative aspect-[3/4] rounded-xl border-4 transition-all transform hover:scale-105 cursor-pointer flex flex-col items-center justify-center p-2 text-center
+                   ${isUnlocked ? 'bg-white border-[#2d2d2d] shadow-md' : 'bg-gray-200 border-gray-400 opacity-70'}
+                 `}
+               >
+                 {isUnlocked ? (
+                   <>
+                     <div className="w-16 h-16 rounded-full border-2 border-gray-400 mb-2 shadow-sm" style={catStyle}></div>
+                     <h3 className="font-bold text-lg">{story.title}</h3>
+                     <span className="text-xs text-gray-500 mt-2">Click to read</span>
+                   </>
+                 ) : (
+                   <div className="text-4xl text-gray-400">🔒</div>
+                 )}
+                 <div className="absolute top-2 left-2 text-xs font-bold bg-gray-100 px-2 py-1 rounded-full border border-gray-300">#{story.id}</div>
+               </div>
+             );
+           })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Story View Component
+const StoryView: React.FC<{
+  storyId: number;
+  onClose: () => void;
+  language: Language;
+}> = ({ storyId, onClose, language }) => {
+  const story = STORY_DATA.find(s => s.id === storyId);
+  if (!story) return null;
+
+  const fonts = [
+      "font-serif", 
+      "font-mono", 
+      "font-['Comic_Sans_MS']", 
+      "font-['Courier_New']", 
+      "font-['Georgia']", 
+      "font-['Times_New_Roman']", 
+      "font-['Verdana']", 
+      "font-['Trebuchet_MS']", 
+      "font-['Arial_Black']", 
+      "font-['Impact']"
+  ];
+  const fontClass = fonts[(storyId - 1) % fonts.length];
+
+  return (
+    <div className="fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4" onClick={onClose}>
+      <div 
+        className={`bg-[#fdfbf7] w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl relative p-8 border-8 border-double border-[#d4a373] animate-[slideUp_0.5s_ease-out] ${fontClass}`}
+        onClick={e => e.stopPropagation()}
+        style={{
+            backgroundImage: 'repeating-linear-gradient(#fdfbf7 0px, #fdfbf7 24px, #e5e5e5 25px)',
+            backgroundAttachment: 'local'
+        }}
+      >
+        <button onClick={onClose} className="absolute top-4 right-4 text-3xl hover:scale-110 text-[#2d2d2d]">✖️</button>
+        
+        <div className="flex flex-col gap-4 text-[#2d2d2d]">
+           <div className="text-center border-b-2 border-[#2d2d2d] pb-4 mb-4">
+              <h2 className="text-3xl font-bold mb-2">{story.title}</h2>
+              <div className="text-sm text-gray-600 flex flex-wrap justify-center gap-4">
+                 <span>{story.breed}</span>
+                 <span>|</span>
+                 <span>{story.difficulty}</span>
+              </div>
+              <div className="mt-2 italic text-gray-500">{story.personality}</div>
+           </div>
+
+           <div className="text-lg font-bold text-center mb-4 text-orange-800">{story.intro}</div>
+           
+           <div className="whitespace-pre-wrap leading-loose text-lg">
+              {story.content}
+           </div>
+
+           <div className="mt-8 p-6 bg-white/80 rounded-xl border-2 border-dashed border-[#2d2d2d] relative rotate-1">
+              <div className="absolute -top-3 -left-3 text-4xl transform -rotate-12">🐾</div>
+              <p className="text-xl font-bold text-center text-blue-800 italic">
+                 "{story.unlockText}"
+              </p>
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Global Ending Component
+const GlobalEnding: React.FC<{ onClose: () => void; language: Language }> = ({ onClose, language }) => {
+    const t = TRANSLATIONS[language];
+    return (
+        <div className="fixed inset-0 z-[120] bg-white flex flex-col items-center justify-center p-8 animate-[fadeIn_2s_ease-in]">
+            <h1 className="text-4xl md:text-6xl font-bold text-[#2d2d2d] mb-8 text-center">The End</h1>
+            <div className="text-xl md:text-2xl text-center max-w-2xl leading-relaxed font-serif mb-12 whitespace-pre-wrap">
+                {t.global_ending}
+            </div>
+            <div className="grid grid-cols-5 gap-2 md:gap-4 mb-8 opacity-50">
+                {Array.from({length: 10}).map((_, i) => <span key={i} className="text-2xl">🐱</span>)}
+            </div>
+            <button onClick={onClose} className="px-8 py-3 bg-[#2d2d2d] text-white rounded-full text-xl hover:scale-105 transition-transform">
+                Return to Title
+            </button>
+        </div>
+    );
+};
+
+
+
 // Updated Level Cell Component
 const LevelCell: React.FC<{ 
   level: LevelData; 
@@ -110,22 +264,6 @@ const LevelCell: React.FC<{
   catName: string;
 }> = ({ level, locked, stars, latest, onClick, catName }) => {
   
-  const getStyle = (t: CatType) => {
-    switch(t) {
-      case 'white': return { background: '#fff' };
-      case 'black': return { background: '#2d2d2d' };
-      case 'tuxedo': return { background: 'linear-gradient(135deg, #2d2d2d 50%, #fff 50%)' };
-      case 'calico': return { background: 'radial-gradient(circle at 30% 30%, #ffa94d 20%, transparent 25%), radial-gradient(circle at 70% 60%, #2d2d2d 20%, transparent 25%), #fff' };
-      case 'siamese': return { background: 'radial-gradient(circle, #4b3621 30%, #fdf5e6 70%)' }; 
-      case 'devon': return { background: '#a0a0a0' }; // Pure Grey
-      case 'orange': return { background: 'repeating-linear-gradient(45deg, #ffb74d, #ffb74d 10px, #e67e22 10px, #e67e22 20px)' }; 
-      case 'sphynx': return { background: '#f5cba7' }; 
-      case 'tabby': return { background: 'repeating-linear-gradient(45deg, #bdc3c7, #bdc3c7 10px, #2c3e50 10px, #2c3e50 20px)' }; 
-      case 'maine_coon': return { background: 'linear-gradient(135deg, #3e2723 0%, #795548 50%, #d7ccc8 100%)' };
-      default: return { background: '#fff' };
-    }
-  };
-
   return (
     <div className="flex flex-col items-center gap-2">
       <button
@@ -135,7 +273,7 @@ const LevelCell: React.FC<{
           ${locked ? 'bg-gray-200 border-gray-300 opacity-70 cursor-not-allowed' : 'hover:scale-105 cursor-pointer border-gray-600'}
           ${latest ? 'ring-4 ring-orange-400 ring-offset-2 animate-pulse' : ''}
         `}
-        style={!locked ? getStyle(level.catType) : {}}
+        style={!locked ? getCatStyle(level.catType) : {}}
       >
         {locked ? (
           <span className="text-4xl text-gray-400 font-bold">?</span>
@@ -174,6 +312,13 @@ const App: React.FC = () => {
   // Settings & Messages State
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showMessages, setShowMessages] = useState<boolean>(false);
+  
+  // Gallery State
+  const [showGallery, setShowGallery] = useState<boolean>(false);
+  const [viewingStoryId, setViewingStoryId] = useState<number | null>(null);
+  const [viewedStories, setViewedStories] = useState<number[]>([]);
+  const [showGlobalEnding, setShowGlobalEnding] = useState<boolean>(false);
+
   const [messages, setMessages] = useState<{text: string, timestamp: number}[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
@@ -192,8 +337,11 @@ const App: React.FC = () => {
   useEffect(() => {
     const savedMax = localStorage.getItem('hellycat_max_level');
     const savedStars = localStorage.getItem('hellycat_stars');
+    const savedViewed = localStorage.getItem('hellycat_viewed_stories');
+    
     if (savedMax) setMaxUnlockedLevel(parseInt(savedMax, 10));
     if (savedStars) setLevelStars(JSON.parse(savedStars));
+    if (savedViewed) setViewedStories(JSON.parse(savedViewed));
   }, []);
 
   const saveProgress = (levelId: number, stars: number) => {
@@ -211,6 +359,20 @@ const App: React.FC = () => {
           const newStars = { ...levelStars, [levelId]: stars };
           setLevelStars(newStars);
           localStorage.setItem('hellycat_stars', JSON.stringify(newStars));
+      }
+
+      // Check Global Ending (All 10 levels completed)
+      if (Object.keys(levelStars).length >= 10 || (levelId === 10 && Object.keys(levelStars).length >= 9)) {
+          // Trigger global ending next time they go to menu or immediately?
+          // Let's trigger it when they return to menu or click a button
+      }
+  };
+
+  const markStoryViewed = (id: number) => {
+      if (!viewedStories.includes(id)) {
+          const newViewed = [...viewedStories, id];
+          setViewedStories(newViewed);
+          localStorage.setItem('hellycat_viewed_stories', JSON.stringify(newViewed));
       }
   };
 
@@ -318,11 +480,28 @@ const App: React.FC = () => {
       setGameState('win');
   };
 
+  // Calculate unlocked stories count for red dot
+  // A story is unlocked if the level is completed (stars > 0)
+  // It is "new" if it's unlocked but not in viewedStories
+  const unlockedStoryIds = Object.keys(levelStars).map(Number);
+  const hasNewStories = unlockedStoryIds.some(id => !viewedStories.includes(id));
+
   return (
     <div className={`w-full h-screen flex flex-col items-center justify-center overflow-hidden relative selection:bg-none select-none text-[#2d2d2d] ${fontClass}`}>
       
       {/* Top Right Controls */}
       <div className="absolute top-2 right-2 md:top-4 md:right-4 z-50 flex gap-2 md:gap-4">
+        {/* Gallery Button */}
+        <button 
+          onClick={() => setShowGallery(true)}
+          className="bg-white border-2 md:border-4 border-black px-3 py-1 md:px-4 md:py-2 rounded-xl text-lg md:text-2xl font-bold hover:scale-105 transition-transform shadow-lg flex items-center justify-center min-w-[3rem] md:min-w-[4rem] relative"
+        >
+          💌
+          {hasNewStories && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+          )}
+        </button>
+
         <button 
           onClick={() => setShowSettings(true)}
           className="bg-white border-2 md:border-4 border-black px-3 py-1 md:px-4 md:py-2 rounded-xl text-lg md:text-2xl font-bold hover:scale-105 transition-transform shadow-lg flex items-center justify-center min-w-[3rem] md:min-w-[4rem]"
@@ -331,6 +510,36 @@ const App: React.FC = () => {
         </button>
       </div>
 
+      {/* Gallery Modal */}
+      {showGallery && (
+          <GalleryModal 
+            unlockedLevels={unlockedStoryIds} 
+            onClose={() => setShowGallery(false)} 
+            language={language}
+            onViewStory={(id) => {
+                setViewingStoryId(id);
+                markStoryViewed(id);
+            }}
+          />
+      )}
+
+      {/* Story View */}
+      {viewingStoryId && (
+          <StoryView 
+            storyId={viewingStoryId} 
+            onClose={() => setViewingStoryId(null)} 
+            language={language}
+          />
+      )}
+
+      {/* Global Ending */}
+      {showGlobalEnding && (
+          <GlobalEnding onClose={() => {
+              setShowGlobalEnding(false);
+              setGameState('start');
+          }} language={language} />
+      )}
+
       {/* Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center backdrop-blur-sm" onClick={() => setShowSettings(false)}>
@@ -338,6 +547,8 @@ const App: React.FC = () => {
             <button className="absolute top-4 right-4 text-2xl" onClick={() => setShowSettings(false)}>✖️</button>
             <h2 className="text-3xl font-bold mb-6 text-center">Settings</h2>
             
+            <SettingsCatAnimation meowText={t.meow_txt} />
+
             <div className="flex flex-col gap-6">
               <div className="flex justify-between items-center">
                 <span className="text-xl font-bold">Sound</span>
@@ -358,6 +569,35 @@ const App: React.FC = () => {
                   {getLanguageLabel(language)}
                 </button>
               </div>
+
+              {gameState === 'playing' && (
+                <>
+                  <div className="w-full h-[2px] bg-gray-200 my-2"></div>
+                  
+                  <button 
+                    onClick={() => {
+                        setShowSettings(false);
+                        setGameState('selection');
+                        setTimeout(() => {
+                            setGameState('playing');
+                        }, 50);
+                    }}
+                    className="w-full bg-orange-100 border-2 border-orange-400 text-orange-700 px-4 py-3 rounded-xl text-xl font-bold hover:bg-orange-200"
+                  >
+                    {t.restart_level}
+                  </button>
+
+                  <button 
+                    onClick={() => {
+                        setShowSettings(false);
+                        setGameState('selection');
+                    }}
+                    className="w-full bg-gray-100 border-2 border-gray-400 text-gray-700 px-4 py-3 rounded-xl text-xl font-bold hover:bg-gray-200"
+                  >
+                    {t.return_menu}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -450,6 +690,15 @@ const App: React.FC = () => {
                >
                  📧
                </button>
+               {Object.keys(levelStars).length >= 10 && (
+                   <button 
+                     onClick={() => setShowGlobalEnding(true)}
+                     className="text-3xl md:text-5xl hover:scale-110 transition-transform animate-pulse text-yellow-500"
+                     title="The End"
+                   >
+                     🌟
+                   </button>
+               )}
             </div>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6 mb-6 md:mb-10 w-full justify-items-center">

@@ -4,9 +4,9 @@ export type CatMode = 'idle' | 'run' | 'manic' | 'caught';
 
 export type CatType = 'white' | 'black' | 'tuxedo' | 'calico' | 'siamese' | 'devon' | 'orange' | 'sphynx' | 'tabby' | 'maine_coon';
 
-export type CatState = 'normal' | 'hungry' | 'dirty' | 'grumpy';
+export type CatState = 'normal' | 'hungry' | 'dirty' | 'grumpy' | 'long_hair' | 'tangled' | 'needs_poop' | 'bored';
 
-export type ItemType = 'fish' | 'bun' | 'pizza' | 'brush' | 'towel' | 'scissors' | 'toy' | 'catnip';
+export type ItemType = 'fish' | 'bun' | 'pizza' | 'brush' | 'scissors' | 'toy' | 'catnip';
 
 export type ItemCategory = 'food' | 'cleaning' | 'toy';
 
