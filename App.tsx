@@ -130,6 +130,11 @@ const GalleryModal: React.FC<{
 }> = ({ unlockedLevels, onClose, language, onViewStory }) => {
   const t = TRANSLATIONS[language];
   
+  const getTranslated = (obj: any) => {
+      if (typeof obj === 'string') return obj;
+      return obj[language] || obj['en'];
+  };
+  
   return (
     <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center backdrop-blur-sm" onClick={onClose}>
       <div className="bg-[#fffdf5] w-[95%] max-w-4xl h-[85vh] rounded-3xl border-[6px] border-[#2d2d2d] shadow-2xl relative flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
@@ -155,7 +160,7 @@ const GalleryModal: React.FC<{
                  {isUnlocked ? (
                    <>
                      <div className="w-16 h-16 rounded-full border-2 border-gray-400 mb-2 shadow-sm" style={catStyle}></div>
-                     <h3 className="font-bold text-lg">{story.title}</h3>
+                     <h3 className="font-bold text-lg">{getTranslated(story.title)}</h3>
                      <span className="text-xs text-gray-500 mt-2">Click to read</span>
                    </>
                  ) : (
