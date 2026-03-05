@@ -127,7 +127,8 @@ const GalleryModal: React.FC<{
   onClose: () => void;
   language: Language;
   onViewStory: (id: number) => void;
-}> = ({ unlockedLevels, onClose, language, onViewStory }) => {
+  viewedStories: number[];
+}> = ({ unlockedLevels, onClose, language, onViewStory, viewedStories }) => {
   const t = TRANSLATIONS[language];
   
   const getTranslated = (obj: any) => {
@@ -146,6 +147,7 @@ const GalleryModal: React.FC<{
         <div className="flex-1 overflow-y-auto p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
            {STORY_DATA.map((story) => {
              const isUnlocked = unlockedLevels.includes(story.id);
+             const isNew = isUnlocked && !viewedStories.includes(story.id);
              const level = LEVELS.find(l => l.id === story.id);
              const catStyle = level ? getCatStyle(level.catType) : {};
              
@@ -157,6 +159,9 @@ const GalleryModal: React.FC<{
                    ${isUnlocked ? 'bg-white border-[#2d2d2d] shadow-md' : 'bg-gray-200 border-gray-400 opacity-70'}
                  `}
                >
+                 {isNew && (
+                    <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse z-10"></span>
+                 )}
                  {isUnlocked ? (
                    <>
                      <div className="w-16 h-16 rounded-full border-2 border-gray-400 mb-2 shadow-sm" style={catStyle}></div>
@@ -351,16 +356,16 @@ const App: React.FC = () => {
 
   const t = TRANSLATIONS[language];
 
-  // Load Persistence
-  useEffect(() => {
-    const savedMax = localStorage.getItem('hellycat_max_level');
-    const savedStars = localStorage.getItem('hellycat_stars');
-    const savedViewed = localStorage.getItem('hellycat_viewed_stories');
-    
-    if (savedMax) setMaxUnlockedLevel(parseInt(savedMax, 10));
-    if (savedStars) setLevelStars(JSON.parse(savedStars));
-    if (savedViewed) setViewedStories(JSON.parse(savedViewed));
-  }, []);
+  // Load Persistence - REMOVED for "Clear on Refresh" requirement
+  // useEffect(() => {
+  //   const savedMax = localStorage.getItem('hellycat_max_level');
+  //   const savedStars = localStorage.getItem('hellycat_stars');
+  //   const savedViewed = localStorage.getItem('hellycat_viewed_stories');
+  //   
+  //   if (savedMax) setMaxUnlockedLevel(parseInt(savedMax, 10));
+  //   if (savedStars) setLevelStars(JSON.parse(savedStars));
+  //   if (savedViewed) setViewedStories(JSON.parse(savedViewed));
+  // }, []);
 
   const saveProgress = (levelId: number, stars: number) => {
       // Update max level if we beat the current max
@@ -368,7 +373,7 @@ const App: React.FC = () => {
       if (levelId === maxUnlockedLevel && levelId < LEVELS.length) {
           newMax = levelId + 1;
           setMaxUnlockedLevel(newMax);
-          localStorage.setItem('hellycat_max_level', newMax.toString());
+          // localStorage.setItem('hellycat_max_level', newMax.toString()); // Removed persistence
       }
       
       // Update stars if better
@@ -376,7 +381,7 @@ const App: React.FC = () => {
       if (stars > currentStars) {
           const newStars = { ...levelStars, [levelId]: stars };
           setLevelStars(newStars);
-          localStorage.setItem('hellycat_stars', JSON.stringify(newStars));
+          // localStorage.setItem('hellycat_stars', JSON.stringify(newStars)); // Removed persistence
       }
 
       // Check Global Ending (All 10 levels completed)
@@ -390,7 +395,7 @@ const App: React.FC = () => {
       if (!viewedStories.includes(id)) {
           const newViewed = [...viewedStories, id];
           setViewedStories(newViewed);
-          localStorage.setItem('hellycat_viewed_stories', JSON.stringify(newViewed));
+          // localStorage.setItem('hellycat_viewed_stories', JSON.stringify(newViewed)); // Removed persistence
       }
   };
 
@@ -534,6 +539,7 @@ const App: React.FC = () => {
             unlockedLevels={unlockedStoryIds} 
             onClose={() => setShowGallery(false)} 
             language={language}
+            viewedStories={viewedStories}
             onViewStory={(id) => {
                 setViewingStoryId(id);
                 markStoryViewed(id);
