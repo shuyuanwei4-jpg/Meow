@@ -7,6 +7,8 @@ import SettingsCatAnimation from './components/SettingsCatAnimation';
 
 // ... (StartCat component remains same)
 
+import CharityBoard from './components/CharityBoard';
+
 // StartCat Component
 const StartCat: React.FC<{ meowText: string }> = ({ meowText }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -178,6 +180,12 @@ const StoryView: React.FC<{
   const story = STORY_DATA.find(s => s.id === storyId);
   if (!story) return null;
 
+  // Translation Helper
+  const getTranslated = (obj: any) => {
+      if (typeof obj === 'string') return obj;
+      return obj[language] || obj['en'];
+  };
+
   const fonts = [
       "font-serif", 
       "font-mono", 
@@ -206,25 +214,25 @@ const StoryView: React.FC<{
         
         <div className="flex flex-col gap-4 text-[#2d2d2d]">
            <div className="text-center border-b-2 border-[#2d2d2d] pb-4 mb-4">
-              <h2 className="text-3xl font-bold mb-2">{story.title}</h2>
+              <h2 className="text-3xl font-bold mb-2">{getTranslated(story.title)}</h2>
               <div className="text-sm text-gray-600 flex flex-wrap justify-center gap-4">
-                 <span>{story.breed}</span>
+                 <span>{getTranslated(story.breed)}</span>
                  <span>|</span>
-                 <span>{story.difficulty}</span>
+                 <span>{getTranslated(story.difficulty)}</span>
               </div>
-              <div className="mt-2 italic text-gray-500">{story.personality}</div>
+              <div className="mt-2 italic text-gray-500">{getTranslated(story.personality)}</div>
            </div>
 
-           <div className="text-lg font-bold text-center mb-4 text-orange-800">{story.intro}</div>
+           <div className="text-lg font-bold text-center mb-4 text-orange-800">{getTranslated(story.intro)}</div>
            
            <div className="whitespace-pre-wrap leading-loose text-lg">
-              {story.content}
+              {getTranslated(story.content)}
            </div>
 
            <div className="mt-8 p-6 bg-white/80 rounded-xl border-2 border-dashed border-[#2d2d2d] relative rotate-1">
               <div className="absolute -top-3 -left-3 text-4xl transform -rotate-12">🐾</div>
               <p className="text-xl font-bold text-center text-blue-800 italic">
-                 "{story.unlockText}"
+                 "{getTranslated(story.unlockText)}"
               </p>
            </div>
         </div>
@@ -318,6 +326,9 @@ const App: React.FC = () => {
   const [viewingStoryId, setViewingStoryId] = useState<number | null>(null);
   const [viewedStories, setViewedStories] = useState<number[]>([]);
   const [showGlobalEnding, setShowGlobalEnding] = useState<boolean>(false);
+
+  // Charity Board State
+  const [showCharityBoard, setShowCharityBoard] = useState<boolean>(false);
 
   const [messages, setMessages] = useState<{text: string, timestamp: number}[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
@@ -605,6 +616,19 @@ const App: React.FC = () => {
 
       {gameState === 'start' && (
         <div className="relative w-full max-w-2xl flex flex-col items-center px-4">
+           {/* Corkboard Entrance (Top Right) */}
+           <div 
+            onClick={() => setShowCharityBoard(true)}
+            className="absolute -top-32 -right-12 md:-right-32 cursor-pointer hover:scale-110 transition-transform z-20"
+            title="Furry Notice Board"
+          >
+             <div className="bg-[#d4a373] border-4 border-[#8d6e63] p-2 rounded shadow-lg rotate-3 w-20 h-20 md:w-24 md:h-24 flex flex-col items-center justify-center text-center relative">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-red-800 shadow-sm"></div>
+                <span className="text-2xl md:text-3xl">📌</span>
+                <span className="text-[10px] md:text-xs font-bold text-[#5d4037] leading-tight mt-1">Notice Board</span>
+             </div>
+          </div>
+
            <div 
              className="absolute top-[-100px] md:top-[-135px] z-0 transition-transform hover:-translate-y-4 duration-300"
              onClick={() => audio.playMeow()}

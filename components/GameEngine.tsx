@@ -361,7 +361,9 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
          ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI*2); ctx.fill();
       } else if (type === 'toy') {
          // Mouse Toy
-         ctx.fillStyle = '#e67e22'; // Orange Mouse
+         ctx.fillStyle = '#89CFF0'; // Baby Blue
+         ctx.strokeStyle = '#5DADE2'; // Darker Blue
+         ctx.lineWidth = 2;
          ctx.beginPath();
          ctx.ellipse(0, 0, 15, 20, 0, 0, Math.PI*2);
          ctx.fill(); ctx.stroke();
@@ -369,7 +371,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
          ctx.beginPath(); ctx.arc(-10, -15, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
          ctx.beginPath(); ctx.arc(10, -15, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
          // Tail
-         ctx.strokeStyle = '#d35400';
+         ctx.strokeStyle = '#5DADE2';
          ctx.beginPath(); ctx.moveTo(0, 20); ctx.quadraticCurveTo(10, 30, 5, 40); ctx.stroke();
       } else if (type === 'catnip') {
          // Catnip Bag
