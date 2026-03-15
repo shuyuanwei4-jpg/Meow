@@ -1,4 +1,4 @@
-export type GameState = 'start' | 'selection' | 'playing' | 'gameover' | 'win';
+export type GameState = 'start' | 'selection' | 'level_intro' | 'playing' | 'gameover' | 'win';
 
 export type CatMode = 'idle' | 'run' | 'manic' | 'caught';
 
@@ -6,7 +6,7 @@ export type CatType = 'white' | 'black' | 'tuxedo' | 'calico' | 'siamese' | 'dev
 
 export type CatState = 'normal' | 'hungry' | 'dirty' | 'grumpy' | 'long_hair' | 'tangled' | 'needs_poop' | 'bored';
 
-export type ItemType = 'fish' | 'bun' | 'pizza' | 'brush' | 'scissors' | 'toy' | 'catnip';
+export type ItemType = 'fish' | 'bun' | 'pizza' | 'brush' | 'scissors' | 'toy' | 'catnip' | 'yarn';
 
 export type ItemCategory = 'food' | 'cleaning' | 'toy';
 

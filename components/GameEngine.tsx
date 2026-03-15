@@ -166,7 +166,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
                 type,
                 category: ITEMS_DATA[type].category,
                 x: 100 + Math.random() * (GAME_WIDTH - 200),
-                y: 100 + Math.random() * (GAME_HEIGHT - 300),
+                y: (isMobile ? 200 : 100) + Math.random() * (GAME_HEIGHT - (isMobile ? 400 : 300)),
                 isDragging: false,
                 width: 60,
                 height: 60
@@ -388,6 +388,26 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
          // Tie
          ctx.strokeStyle = '#f1c40f';
          ctx.beginPath(); ctx.moveTo(-15, -15); ctx.lineTo(15, -15); ctx.stroke();
+      } else if (type === 'yarn') {
+         // Yarn Ball
+         ctx.fillStyle = '#e91e63'; // Pinkish red
+         ctx.strokeStyle = '#c2185b';
+         ctx.lineWidth = 2;
+         ctx.beginPath();
+         ctx.arc(0, 0, 20, 0, Math.PI * 2);
+         ctx.fill(); ctx.stroke();
+         // Yarn threads
+         ctx.beginPath();
+         ctx.moveTo(-15, -10); ctx.quadraticCurveTo(0, -20, 15, -10);
+         ctx.moveTo(-18, 0); ctx.quadraticCurveTo(0, -10, 18, 0);
+         ctx.moveTo(-15, 10); ctx.quadraticCurveTo(0, 0, 15, 10);
+         ctx.moveTo(-5, -18); ctx.quadraticCurveTo(-15, 0, -5, 18);
+         ctx.moveTo(5, -18); ctx.quadraticCurveTo(15, 0, 5, 18);
+         ctx.stroke();
+         // Loose thread
+         ctx.beginPath();
+         ctx.moveTo(15, 10); ctx.quadraticCurveTo(30, 20, 25, 35);
+         ctx.stroke();
       }
       
       // Label removed as requested
@@ -447,7 +467,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
 
     ctx.save();
     const winX = isMobile ? 50 : 100;
-    const winY = isMobile ? 150 : 180;
+    const winY = isMobile ? 350 : 180;
     ctx.translate(winX, winY);
     
     // Window drawing
@@ -494,7 +514,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
 
     ctx.save();
     const plantX = isMobile ? 300 : GAME_WIDTH - 100;
-    const plantY = isMobile ? 250 : 180;
+    const plantY = isMobile ? 450 : 180;
     ctx.translate(plantX, plantY);
     
     if (plantTrimmedRef.current) {
@@ -1305,13 +1325,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ onGameOver, onWin, levelData, l
           success = true;
           // Spawn hair particles
           spawnParticles(cat.x, cat.y, catType === 'white' ? '#eee' : '#333', 15);
-      } else if (cat.state === 'tangled' && item.type === 'brush') {
-          // Changed: Brush is now for dirty (mud), but maybe still for tangled?
-          // User request specifically said brush is for mud. 
-          // Let's assume tangled needs brush too, or maybe scissors? 
-          // Previous logic used brush for tangled. Let's keep it but maybe add scrubbing requirement for tangled too?
-          // For simplicity, let's keep instant fix for tangled for now, or make it require scrubbing too.
-          // But user emphasized mud.
+      } else if (cat.state === 'tangled' && item.type === 'yarn') {
           success = true;
           audio.playMeow();
       } else if (cat.state === 'bored' && item.type === 'toy') {

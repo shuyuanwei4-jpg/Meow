@@ -51,7 +51,7 @@ export const FOOD_BOWL = {
 
 export const MOBILE_FOOD_BOWL = {
   x: 30,
-  y: 100,
+  y: 250,
   width: 100,
   height: 80
 };
@@ -71,7 +71,8 @@ export const ITEMS_DATA: Record<ItemType, { category: ItemCategory, color: strin
   brush: { category: 'cleaning', color: '#9b59b6', label: 'Brush' },
   scissors: { category: 'cleaning', color: '#95a5a6', label: 'Scissors' },
   toy: { category: 'toy', color: '#e67e22', label: 'Toy' },
-  catnip: { category: 'toy', color: '#2ecc71', label: 'Catnip' }
+  catnip: { category: 'toy', color: '#2ecc71', label: 'Catnip' },
+  yarn: { category: 'toy', color: '#e91e63', label: 'Yarn' }
 };
 
 export interface LevelData {
@@ -130,7 +131,7 @@ export const LEVELS: LevelData[] = [
     difficulty: 7, 
     timeTargets: [50, 70],
     stateSequence: ['tangled', 'bored', 'dirty'],
-    availableItems: ['brush', 'toy']
+    availableItems: ['brush', 'toy', 'yarn']
   },
   { 
     id: 7, 
@@ -146,7 +147,7 @@ export const LEVELS: LevelData[] = [
     difficulty: 9, 
     timeTargets: [70, 90],
     stateSequence: ['long_hair', 'tangled', 'dirty', 'bored'],
-    availableItems: ['scissors', 'brush', 'toy']
+    availableItems: ['scissors', 'brush', 'toy', 'yarn']
   },
   { 
     id: 9, 
@@ -162,7 +163,7 @@ export const LEVELS: LevelData[] = [
     difficulty: 10, 
     timeTargets: [90, 120],
     stateSequence: ['long_hair', 'dirty', 'tangled', 'bored', 'needs_poop'],
-    availableItems: ['scissors', 'brush', 'toy']
+    availableItems: ['scissors', 'brush', 'toy', 'yarn']
   },
 ];
 
@@ -180,7 +181,7 @@ export const STORY_DATA = [
     },
     unlockText: { zh: "每一个故事都有一个起点。小白是我们的。", en: "Every story has a beginning. Snow is ours." },
     egg: { zh: "洗澡过程中，背景里能看到奶茶店的招牌在窗外闪烁。", en: "During the bath, the bubble tea shop sign flickers outside the window." },
-    realImage: "https://images.unsplash.com/photo-1517331156700-3c241d2b4d83?q=80&w=1000&auto=format&fit=crop"
+    realImage: "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 2,
@@ -285,7 +286,7 @@ export const STORY_DATA = [
     },
     unlockText: { zh: "养一只猫是承诺，不是尝试。但没关系，现在换我们来承诺。", en: "Owning a cat is a promise. It's okay, now we make that promise." },
     egg: { zh: "洗澡过程中每解开/洗掉一个\"毛结区域\"，会有一小段文字闪过，像是旧主人的内心独白碎片。洗完后这些文字全部消失，只剩下一句：\"现在你很漂亮了，卷毛。\"", en: "Flashbacks of the old owner's thoughts appear as mats are removed. At the end, only: \"You are beautiful now, Curly.\"" },
-    realImage: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?q=80&w=1000&auto=format&fit=crop"
+    realImage: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 9,
@@ -315,7 +316,7 @@ export const STORY_DATA = [
     },
     unlockText: { zh: "不是所有的分别都是遗弃。有些放手，是因为太爱了。\n小林，缅因洗好了。他很乖。他在等你。", en: "Not all goodbyes are abandonment. Some let go because they love too much.\nLin, Maine is clean. He's waiting." },
     egg: { zh: "这是唯一一关通关后会出现额外动画的关卡。洗完澡后，画面慢慢淡出，出现一张手机屏幕的画面——是小林发来的微信消息：\"今天的检查结果出来了。医生说情况比想象的好。❤️\" \"等我好了，第一件事就是来接他。\" \"谢谢你们。\"", en: "After the bath, a phone screen appears. A message from Lin: \"Doctor says I'm improving. ❤️ I'll come for him as soon as I'm well. Thank you.\"" },
-    realImage: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?q=80&w=1000&auto=format&fit=crop"
+    realImage: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?q=80&w=1000&auto=format&fit=crop"
   }
 ];
 
@@ -330,6 +331,10 @@ export const TRANSLATIONS = {
     controls_grab_mobile: "Pinch to Grab",
     controls_tub_mobile: "Drop in Tub",
     start_btn: "Start Catching!",
+    level_objective: "Objective",
+    level_objective_desc: "Clean the cat! Use the available tools to resolve its needs, then drag it to the bathtub.",
+    available_tools: "Available Tools:",
+    start_level_btn: "Start Level!",
     choose_cat: "Select Level",
     temperament: "Temperament",
     chill: "Chill",
@@ -380,6 +385,10 @@ export const TRANSLATIONS = {
     controls_grab_mobile: "双指捏合",
     controls_tub_mobile: "放入澡盆",
     start_btn: "开始抓猫！",
+    level_objective: "关卡目标",
+    level_objective_desc: "给猫咪洗个澡！使用可用的工具解决它的需求，然后把它拖进澡盆里。",
+    available_tools: "可用工具：",
+    start_level_btn: "开始关卡！",
     choose_cat: "选择关卡",
     temperament: "脾气",
     chill: "温顺",

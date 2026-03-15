@@ -8,6 +8,7 @@ import SettingsCatAnimation from './components/SettingsCatAnimation';
 // ... (StartCat component remains same)
 
 import CharityBoard from './components/CharityBoard';
+import AdminDashboard from './components/AdminDashboard';
 
 // StartCat Component
 const StartCat: React.FC<{ meowText: string }> = ({ meowText }) => {
@@ -341,6 +342,7 @@ const App: React.FC = () => {
 
   // Charity Board State
   const [showCharityBoard, setShowCharityBoard] = useState<boolean>(false);
+  const [showAdmin, setShowAdmin] = useState<boolean>(false);
 
   const [messages, setMessages] = useState<{text: string, timestamp: number}[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
@@ -436,6 +438,19 @@ const App: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [showMessages]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'a' || e.key === 'A') {
+        // Only toggle if not typing in an input
+        if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+          setShowAdmin(prev => !prev);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -571,6 +586,11 @@ const App: React.FC = () => {
         language={language} 
       />
 
+      {/* Admin Dashboard */}
+      {showAdmin && (
+        <AdminDashboard onClose={() => setShowAdmin(false)} />
+      )}
+
       {/* Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center backdrop-blur-sm" onClick={() => setShowSettings(false)}>
@@ -651,13 +671,13 @@ const App: React.FC = () => {
             onClick={() => setShowCharityBoard(true)}
             className="absolute -top-32 -right-12 md:-right-32 cursor-pointer hover:scale-110 transition-transform z-20"
             title="Furry Notice Board"
-          >
-             <div className="bg-[#d4a373] border-4 border-[#8d6e63] p-2 rounded shadow-lg rotate-3 w-20 h-20 md:w-24 md:h-24 flex flex-col items-center justify-center text-center relative">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-red-800 shadow-sm"></div>
-                <span className="text-2xl md:text-3xl">📌</span>
-                <span className="text-[10px] md:text-xs font-bold text-[#5d4037] leading-tight mt-1">Notice Board</span>
-             </div>
-          </div>
+           >
+              <div className="bg-[#d4a373] border-4 border-[#8d6e63] p-2 rounded shadow-lg rotate-3 w-20 h-20 md:w-24 md:h-24 flex flex-col items-center justify-center text-center relative">
+                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-red-800 shadow-sm"></div>
+                 <span className="text-2xl md:text-3xl">📌</span>
+                 <span className="text-[10px] md:text-xs font-bold text-[#5d4037] leading-tight mt-1">Notice Board</span>
+              </div>
+           </div>
 
            <div 
              className="absolute top-[-100px] md:top-[-135px] z-0 transition-transform hover:-translate-y-4 duration-300"
@@ -696,14 +716,14 @@ const App: React.FC = () => {
                ) : (
                  <>
                    <div className="flex flex-col items-center bg-gray-100 p-2 md:p-4 rounded-xl border-2 border-dashed border-gray-300 min-w-[80px]">
-                     <span className="text-2xl md:text-4xl mb-1 md:mb-2">⌨️</span>
-                     <span className="text-orange-600">WASD</span>
-                     <span className="text-gray-500 text-xs md:text-sm">{t.controls_wasd}</span>
+                     <span className="text-2xl md:text-4xl mb-1 md:mb-2">🖱️</span>
+                     <span className="text-orange-600">CLICK</span>
+                     <span className="text-gray-500 text-xs md:text-sm">{t.controls_space}</span>
                    </div>
                    <div className="flex flex-col items-center bg-gray-100 p-2 md:p-4 rounded-xl border-2 border-dashed border-gray-300 min-w-[80px]">
-                     <span className="text-2xl md:text-4xl mb-1 md:mb-2">✊</span>
-                     <span className="text-orange-600">SPACE</span>
-                     <span className="text-gray-500 text-xs md:text-sm">{t.controls_space}</span>
+                     <span className="text-2xl md:text-4xl mb-1 md:mb-2">👆</span>
+                     <span className="text-orange-600">DRAG</span>
+                     <span className="text-gray-500 text-xs md:text-sm">{t.controls_wasd}</span>
                    </div>
                    <div className="flex flex-col items-center bg-gray-100 p-2 md:p-4 rounded-xl border-2 border-dashed border-gray-300 min-w-[80px]">
                      <span className="text-2xl md:text-4xl mb-1 md:mb-2">🛁</span>
@@ -722,6 +742,44 @@ const App: React.FC = () => {
               className="px-8 py-3 md:px-12 md:py-4 bg-[#2d2d2d] text-white text-2xl md:text-4xl rounded-xl hover:scale-105 hover:bg-orange-500 transition-all transform shadow-lg font-bold"
             >
               {t.start_btn}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {gameState === 'level_intro' && currentLevelData && (
+        <div className="relative w-full max-w-2xl flex flex-col items-center px-4 z-50">
+          <div className="z-10 text-center p-8 md:p-12 bg-[#fffdf5] rounded-3xl border-[6px] border-[#2d2d2d] shadow-[12px_12px_0px_0px_rgba(231,76,60,0.2)] w-full mx-4">
+            <h2 className="text-4xl md:text-6xl font-bold mb-6 text-[#2d2d2d]">
+              Level {currentLevelData.id}
+            </h2>
+            <div className="bg-orange-100 border-4 border-orange-300 rounded-2xl p-6 mb-8">
+              <h3 className="text-2xl font-bold text-orange-800 mb-4">{t.level_objective}</h3>
+              <p className="text-xl text-orange-900 font-medium">
+                {t.level_objective_desc}
+              </p>
+            </div>
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-gray-700 mb-4">{t.available_tools}</h3>
+              <div className="flex justify-center gap-4 flex-wrap">
+                {currentLevelData.availableItems.map(item => (
+                  <div key={item} className="bg-white border-2 border-gray-300 rounded-xl p-3 flex flex-col items-center">
+                    <span className="text-3xl mb-2">
+                      {item === 'brush' ? '🪥' : item === 'clippers' ? '✂️' : item === 'treat' ? '🐟' : item === 'towel' ? '🧣' : item === 'yarn' ? '🧶' : '📦'}
+                    </span>
+                    <span className="text-sm font-bold text-gray-600 capitalize">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button 
+              onClick={() => {
+                audio.playMeow();
+                setGameState('playing');
+              }}
+              className="px-10 py-4 bg-emerald-500 text-white text-2xl md:text-3xl rounded-xl hover:scale-105 hover:bg-emerald-400 transition-all transform shadow-lg font-bold border-4 border-emerald-700"
+            >
+              {t.start_level_btn}
             </button>
           </div>
         </div>
@@ -774,7 +832,7 @@ const App: React.FC = () => {
                       // Slight delay to allow sound before starting
                       setTimeout(() => {
                           audio.stopTheme(); 
-                          setGameState('playing');
+                          setGameState('level_intro');
                       }, 300);
                     }}
                   />
